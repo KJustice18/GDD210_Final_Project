@@ -8,6 +8,15 @@ public class PlayerInteraction : MonoBehaviour
 {
     public Transform camTrans;
     public TMP_Text interactableText;
+    public TMP_Text narrativeText;
+
+    private float textAppearTime = 2f;
+    private float textDisappearTime;
+
+    public GameObject Door1;
+    public GameObject Door2;
+    public GameObject MirrorMonster;
+    public GameObject Mirror;
 
     private bool hasKey;
 
@@ -15,7 +24,15 @@ public class PlayerInteraction : MonoBehaviour
     void Start()
     {
         interactableText.enabled = false;
+        narrativeText.enabled = false;
         hasKey = false;
+        Door1.SetActive(false);
+        Door2.SetActive(true);
+        MirrorMonster.SetActive(false);
+        Mirror.SetActive(true);
+
+        textAppearTime = Time.time + textAppearTime;
+
     }
 
     // Update is called once per frame
@@ -59,6 +76,35 @@ public class PlayerInteraction : MonoBehaviour
                     
                 }
 
+                if (hit.collider.name == "NarrativeCube")
+                {
+                    interactableText.enabled = true;
+                    interactableText.text = "Click to interact with the " + hit.collider.name;
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        //Need code to trigger narrative thoughts
+                        narrativeText.text = "NarrativeCube Associated Text";
+                        narrativeText.enabled = true;
+                        textDisappearTime = 5;
+                        MirrorMonster.SetActive(true);
+                        
+                    }
+                }
+
+                if (hit.collider.name == "NarrativeCube2")
+                {
+                    interactableText.enabled = true;
+                    interactableText.text = "Click to interact with the " + hit.collider.name;
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        //Need code to trigger narrative thoughts
+                        narrativeText.text = "NarrativeCube2 Associated Text";
+                        narrativeText.enabled = true;
+                        textDisappearTime = 5;
+                        Door2.SetActive(false);
+                    }
+                }
+
             }
             else 
             {
@@ -71,6 +117,18 @@ public class PlayerInteraction : MonoBehaviour
         {
             SceneManager.LoadScene("Kyle");
         }
+        
+        if (narrativeText.enabled)
+        {
+            textDisappearTime -= Time.deltaTime;
+
+            if (textDisappearTime <= 0) 
+            {
+                narrativeText.enabled = false;
+
+            }
+        }
+        
     }
 
     private void OnTriggerEnter(Collider other)
@@ -81,6 +139,11 @@ public class PlayerInteraction : MonoBehaviour
             {
                 other.gameObject.GetComponent<MeshRenderer>().material.color = Color.green;
             }
+        }
+
+        if (other.gameObject.name == "Door1Trigger") 
+        {
+            Door1.SetActive(true);
         }
     }
 

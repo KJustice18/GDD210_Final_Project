@@ -7,6 +7,8 @@ public class MirrorMonster : MonoBehaviour
 
     private bool beenSeen;
     private bool inView;
+
+    public GameObject mirror;
     // Start is called before the first frame update
     void Start()
     {
@@ -21,6 +23,7 @@ public class MirrorMonster : MonoBehaviour
         {
             gameObject.GetComponent<MeshRenderer>().enabled = false;
             beenSeen = false;
+            mirror.SetActive(false);
         }
 
         //Causes the Monster to reappear (For debugging)
