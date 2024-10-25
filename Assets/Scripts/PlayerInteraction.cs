@@ -17,6 +17,7 @@ public class PlayerInteraction : MonoBehaviour
     public GameObject Door2;
     public GameObject MirrorMonster;
     public GameObject Mirror;
+    public GameObject MirrorLights;
 
     private bool hasKey;
 
@@ -31,7 +32,6 @@ public class PlayerInteraction : MonoBehaviour
         MirrorMonster.SetActive(false);
         Mirror.SetActive(true);
 
-        textAppearTime = Time.time + textAppearTime;
 
     }
 
@@ -87,6 +87,7 @@ public class PlayerInteraction : MonoBehaviour
                         narrativeText.enabled = true;
                         textDisappearTime = 5;
                         MirrorMonster.SetActive(true);
+
                         
                     }
                 }
@@ -100,10 +101,25 @@ public class PlayerInteraction : MonoBehaviour
                         //Need code to trigger narrative thoughts
                         narrativeText.text = "NarrativeCube2 Associated Text";
                         narrativeText.enabled = true;
-                        textDisappearTime = 5;
+                        textDisappearTime = textAppearTime;
                         Door2.SetActive(false);
                     }
                 }
+
+                if (hit.collider.name == "Flashlight" || hit.collider.name == "FlashlightHead")
+                {
+                    interactableText.enabled = true;
+                    interactableText.text = "Click to interact with the " + hit.collider.name;
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        //Need code to trigger narrative thoughts
+                        narrativeText.text = "Flashlight Associated Text";
+                        narrativeText.enabled = true;
+                        textDisappearTime = textAppearTime;
+                        Door2.SetActive(false);
+                    }
+                }
+
 
             }
             else 

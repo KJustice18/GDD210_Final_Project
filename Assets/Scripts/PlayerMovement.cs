@@ -54,5 +54,18 @@ public class PlayerMovement : MonoBehaviour
         movement += (transform.up * vertSpeed * Time.deltaTime);
 
         cc.Move(movement);
+
+        if (Input.GetKeyDown(KeyCode.LeftBracket)) 
+        {
+            if (MouseSens > 100) 
+            {
+                MouseSens -= 100;
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.RightBracket))
+        { 
+            MouseSens += 100;
+        }
     }
 }

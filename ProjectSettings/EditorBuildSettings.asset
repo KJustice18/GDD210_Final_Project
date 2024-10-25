@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/Kyle.unity
+    guid: 75aec8c6d6583d042a50a8a4d9d5c352
   m_configObjects: {}
