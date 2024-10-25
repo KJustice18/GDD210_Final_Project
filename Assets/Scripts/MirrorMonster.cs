@@ -9,10 +9,12 @@ public class MirrorMonster : MonoBehaviour
     private bool inView;
 
     public GameObject mirror;
+    public GameObject mirrorLights;
+    public GameObject flashlight;
     // Start is called before the first frame update
     void Start()
     {
-        
+        flashlight.SetActive(false);
     }
 
     // Update is called once per frame
@@ -24,6 +26,8 @@ public class MirrorMonster : MonoBehaviour
             gameObject.GetComponent<MeshRenderer>().enabled = false;
             beenSeen = false;
             mirror.SetActive(false);
+            mirrorLights.SetActive(false);
+            flashlight.SetActive(true);
         }
 
         //Causes the Monster to reappear (For debugging)
