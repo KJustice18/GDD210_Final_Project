@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -17,9 +18,19 @@ public class PlayerInteraction : MonoBehaviour
     public GameObject Door2;
     public GameObject MirrorMonster;
     public GameObject Mirror;
+    public GameObject MuddyTracks;
     public GameObject MirrorLights;
+    public GameObject FlashlightLight;
 
     private bool hasKey;
+    private bool BedPressed;
+    private bool PicturePressed;
+    private bool CigsPressed;
+    private bool MirrorReady;
+
+    private bool HallwayTriggered;
+    private bool DoorwayTriggered;
+
 
     // Start is called before the first frame update
     void Start()
@@ -31,7 +42,18 @@ public class PlayerInteraction : MonoBehaviour
         Door2.SetActive(true);
         MirrorMonster.SetActive(false);
         Mirror.SetActive(true);
+        MuddyTracks.SetActive(false);
+        MirrorLights.SetActive(true);
+        FlashlightLight.SetActive(false);
 
+        BedPressed = false;
+        PicturePressed = false;
+        CigsPressed = false;
+        MirrorReady = false;
+
+        HallwayTriggered = false;
+        DoorwayTriggered = false;
+        
 
     }
 
@@ -82,12 +104,9 @@ public class PlayerInteraction : MonoBehaviour
                     interactableText.text = "Click to interact with the " + hit.collider.name;
                     if (Input.GetMouseButtonDown(0))
                     {
-                        //Need code to trigger narrative thoughts
                         narrativeText.text = "NarrativeCube Associated Text";
                         narrativeText.enabled = true;
                         textDisappearTime = 5;
-                        MirrorMonster.SetActive(true);
-
                         
                     }
                 }
@@ -98,7 +117,6 @@ public class PlayerInteraction : MonoBehaviour
                     interactableText.text = "Click to interact with the " + hit.collider.name;
                     if (Input.GetMouseButtonDown(0))
                     {
-                        //Need code to trigger narrative thoughts
                         narrativeText.text = "NarrativeCube2 Associated Text";
                         narrativeText.enabled = true;
                         textDisappearTime = textAppearTime;
@@ -106,19 +124,96 @@ public class PlayerInteraction : MonoBehaviour
                     }
                 }
 
-                if (hit.collider.name == "Flashlight" || hit.collider.name == "FlashlightHead")
+                if (hit.collider.name == "FlashlightBase" || hit.collider.name == "FlashlightHead")
+                {
+                    interactableText.enabled = true;
+                    interactableText.text = "Click to interact with the Flashlight";
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        narrativeText.text = "Flashlight Associated Text";
+                        narrativeText.enabled = true;
+                        textDisappearTime = textAppearTime;
+                        MirrorLights.SetActive(false);
+                        FlashlightLight.SetActive(true);
+                        Door2.SetActive(false);
+
+                    }
+                }
+
+                if (hit.collider.name == "PackOfCigs")
                 {
                     interactableText.enabled = true;
                     interactableText.text = "Click to interact with the " + hit.collider.name;
                     if (Input.GetMouseButtonDown(0))
                     {
-                        //Need code to trigger narrative thoughts
-                        narrativeText.text = "Flashlight Associated Text";
+                        narrativeText.text = "Oh thank god I still have a pack left ...Sorry Bea";
                         narrativeText.enabled = true;
                         textDisappearTime = textAppearTime;
-                        Door2.SetActive(false);
+                        CigsPressed = true;
                     }
                 }
+
+                if (hit.collider.name == "PictureFrame")
+                {
+                    interactableText.enabled = true;
+                    interactableText.text = "Click to interact with the " + hit.collider.name;
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        narrativeText.text = "God, why does my smile look like that?";
+                        narrativeText.enabled = true;
+                        textDisappearTime = textAppearTime;
+                        PicturePressed = true;
+                    }
+                }
+
+                if (hit.collider.name == "RoommatesBed")
+                {
+                    interactableText.enabled = true;
+                    interactableText.text = "Click to interact with the " + hit.collider.name;
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        narrativeText.text = "It’s late, Bea should be home by now. Where is she?";
+                        narrativeText.enabled = true;
+                        textDisappearTime = textAppearTime;
+                        BedPressed = true;
+                    }
+                }
+
+                if (hit.collider.name == "Mirror")
+                {
+                    interactableText.enabled = true;
+                    interactableText.text = "Click to interact with the " + hit.collider.name;
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        if (MirrorReady)
+                        {
+                            narrativeText.text = "That isn’t me. I know that isn’t me.";
+                        }
+                        else 
+                        {
+                            narrativeText.text = "It feels like somthing is missing.";
+
+                        }
+
+                        narrativeText.enabled = true;
+                        textDisappearTime = textAppearTime;
+
+                    }
+                }
+
+                if (hit.collider.name == "MuddyTracks")
+                {
+                    interactableText.enabled = true;
+                    interactableText.text = "Click to interact with the " + hit.collider.name;
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        narrativeText.text = "Is that mud? Where did that even come from?";
+                        narrativeText.enabled = true;
+                        textDisappearTime = textAppearTime;
+                    }
+                }
+
+
 
 
             }
@@ -126,6 +221,13 @@ public class PlayerInteraction : MonoBehaviour
             {
                 interactableText.enabled = false;
             }
+        }
+
+        //SpawntheMirrorMonster
+        if (BedPressed && PicturePressed && CigsPressed) 
+        {
+            MirrorMonster.SetActive(true);
+            MirrorReady = true;
         }
 
         //Reset the scene
@@ -157,9 +259,29 @@ public class PlayerInteraction : MonoBehaviour
             }
         }
 
-        if (other.gameObject.name == "Door1Trigger") 
+        if (other.gameObject.name == "Door1Trigger" && !DoorwayTriggered) 
         {
             Door1.SetActive(true);
+            MuddyTracks.SetActive(true);
+            narrativeText.text = "Oh. I’m home.";
+            narrativeText.enabled = true;
+            textDisappearTime = textAppearTime;
+            DoorwayTriggered = true;
+        }
+
+        if (other.gameObject.name == "HallwaySubtitleTrigger" && !HallwayTriggered)
+        {
+            narrativeText.text = "What the hell is this? Why am I here?";
+            narrativeText.enabled = true;
+            textDisappearTime = textAppearTime;
+            HallwayTriggered = true;
+        }
+
+        if (other.gameObject.name == "FinishTrigger")
+        {
+            narrativeText.text = "The Demo Concludes Here. Press r to restart";
+            narrativeText.enabled = true;
+            textDisappearTime = textAppearTime;
         }
     }
 
