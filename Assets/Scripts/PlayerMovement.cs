@@ -6,6 +6,7 @@ public class PlayerMovement : MonoBehaviour
 {
     // Start is called before the first frame update
 
+    public GameObject Cam;
     public Transform camTrans;
     public CharacterController cc;
     private float camRotation = 0f;
@@ -15,9 +16,18 @@ public class PlayerMovement : MonoBehaviour
     public float JumpSpeed;
     private float vertSpeed;
 
+    private AudioSource FootstepSource;
+    public AudioClip FootstepClip;
+
+    private float countdown;
+    public float FootstepInterval;
+
+
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
+        FootstepSource = Cam.GetComponent<AudioSource>();
+
 
     }
 
@@ -55,17 +65,37 @@ public class PlayerMovement : MonoBehaviour
 
         cc.Move(movement);
 
+        if (cc.velocity != Vector3.zero)
+        {
+            if (countdown <= FootstepInterval)
+            {
+                countdown += Time.deltaTime;
+
+            }
+            else
+            {
+                FootstepSource.clip = FootstepClip;
+                FootstepSource.Play();
+                countdown = 0f;
+            }
+        }
+        else 
+        {
+            FootstepSource.Stop();
+        }
+
+
         if (Input.GetKeyDown(KeyCode.LeftBracket)) 
         {
-            if (MouseSens > 100) 
+            if (MouseSens > 50) 
             {
-                MouseSens -= 100;
+                MouseSens -= 50;
             }
         }
 
         if (Input.GetKeyDown(KeyCode.RightBracket))
         { 
-            MouseSens += 100;
+            MouseSens += 50;
         }
     }
 }

@@ -10,26 +10,35 @@ public class PlayerInteraction : MonoBehaviour
     public Transform camTrans;
     public TMP_Text interactableText;
     public TMP_Text narrativeText;
+    public LayerMask layerMask;
 
     private float textAppearTime = 2f;
     private float textDisappearTime;
 
     public GameObject Door1;
     public GameObject Door2;
-    public GameObject MirrorMonster;
     public GameObject Mirror;
     public GameObject MuddyTracks;
     public GameObject MirrorLights;
     public GameObject FlashlightLight;
+    public GameObject Hair;
+    public GameObject FrameUp;
+    public GameObject FrameDown;
 
     private bool hasKey;
     private bool BedPressed;
     private bool PicturePressed;
     private bool CigsPressed;
+    private bool BearPressed;
     private bool MirrorReady;
+    private bool MirrorReady2;
 
     private bool HallwayTriggered;
     private bool DoorwayTriggered;
+
+    private AudioSource PlayerAudio;
+    public AudioClip FlashlightButton;
+    public AudioClip FrameBreak;
 
 
     // Start is called before the first frame update
@@ -40,20 +49,24 @@ public class PlayerInteraction : MonoBehaviour
         hasKey = false;
         Door1.SetActive(false);
         Door2.SetActive(true);
-        MirrorMonster.SetActive(false);
         Mirror.SetActive(true);
         MuddyTracks.SetActive(false);
         MirrorLights.SetActive(true);
         FlashlightLight.SetActive(false);
+        FrameDown.SetActive(false);
+        FrameUp.SetActive(true);
 
         BedPressed = false;
         PicturePressed = false;
         CigsPressed = false;
+        BearPressed = false;
         MirrorReady = false;
+        MirrorReady2 = false;
 
         HallwayTriggered = false;
         DoorwayTriggered = false;
         
+        PlayerAudio = GetComponent<AudioSource>();
 
     }
 
@@ -63,7 +76,7 @@ public class PlayerInteraction : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(camTrans.position, camTrans.forward, out hit))
         {
-            Debug.DrawLine(camTrans.position + new Vector3(0f, -1f, 0f), hit.point, Color.green, 5f);
+            Debug.DrawLine(camTrans.position + new Vector3(0f, -.01f, 0f), hit.point, Color.green, 5f);
             if (hit.collider.gameObject.tag == "Interactable")
             {
 
@@ -124,18 +137,20 @@ public class PlayerInteraction : MonoBehaviour
                     }
                 }
 
-                if (hit.collider.name == "FlashlightBase" || hit.collider.name == "FlashlightHead")
+                if (hit.collider.name == "Flashlight")
                 {
                     interactableText.enabled = true;
                     interactableText.text = "Click to interact with the Flashlight";
                     if (Input.GetMouseButtonDown(0))
                     {
-                        narrativeText.text = "Flashlight Associated Text";
-                        narrativeText.enabled = true;
-                        textDisappearTime = textAppearTime;
+                        //narrativeText.text = "Flashlight Associated Text";
+                        //narrativeText.enabled = true;
+                        //textDisappearTime = textAppearTime;
                         MirrorLights.SetActive(false);
                         FlashlightLight.SetActive(true);
                         Door2.SetActive(false);
+                        PlayerAudio.clip = FlashlightButton;
+                        PlayerAudio.Play();
 
                     }
                 }
@@ -179,19 +194,25 @@ public class PlayerInteraction : MonoBehaviour
                     }
                 }
 
-                if (hit.collider.name == "Mirror")
+                if (hit.collider.name == "MirrorQuad")
                 {
                     interactableText.enabled = true;
-                    interactableText.text = "Click to interact with the " + hit.collider.name;
+                    interactableText.text = "Click to interact with the Mirror";
                     if (Input.GetMouseButtonDown(0))
                     {
                         if (MirrorReady)
                         {
                             narrativeText.text = "That isn’t me. I know that isn’t me.";
+                            MirrorReady2 = true;
+                            FrameUp.SetActive(false);
+                            FrameDown.SetActive(true);
+                            PlayerAudio.clip = FrameBreak;
+                            PlayerAudio.Play();
+
                         }
                         else 
                         {
-                            narrativeText.text = "It feels like somthing is missing.";
+                            narrativeText.text = "It's just a mirror.";
 
                         }
 
@@ -213,7 +234,18 @@ public class PlayerInteraction : MonoBehaviour
                     }
                 }
 
-
+                if (hit.collider.name == "TeddyBear")
+                {
+                    interactableText.enabled = true;
+                    interactableText.text = "Click to interact with the " + hit.collider.name;
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        narrativeText.text = "I can’t believe she still has that thing, does she not know how old she is?";
+                        narrativeText.enabled = true;
+                        textDisappearTime = textAppearTime;
+                        BearPressed = true;
+                    }
+                }
 
 
             }
@@ -223,19 +255,31 @@ public class PlayerInteraction : MonoBehaviour
             }
         }
 
-        //SpawntheMirrorMonster
-        if (BedPressed && PicturePressed && CigsPressed) 
+        //Checks if the player has interacted with all of the significant objects in the room
+        if (BedPressed && PicturePressed && CigsPressed && BearPressed) 
         {
-            MirrorMonster.SetActive(true);
             MirrorReady = true;
         }
 
+        if (MirrorReady)
+        {
+            Hair.GetComponent<Renderer>().material.color = Color.red;
+
+            Vector3 forward = transform.forward;
+            Vector3 toMirror = Vector3.Normalize(Mirror.transform.position - transform.position);
+
+            if (Vector3.Dot(forward, toMirror) < 0 && MirrorReady2) 
+            {
+                Mirror.SetActive(false);
+            }
+        }
         //Reset the scene
         if (Input.GetKeyDown(KeyCode.R)) 
         {
             SceneManager.LoadScene("Kyle");
         }
         
+        //Timer to make the subtitles dissapear
         if (narrativeText.enabled)
         {
             textDisappearTime -= Time.deltaTime;
